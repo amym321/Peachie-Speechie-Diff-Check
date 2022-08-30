@@ -96,7 +96,7 @@
           {%- assign collection_image_alt = collection.products.first.featured_image.alt | escape -%}
         {% endif %}
 
-        <div class="column
+        <div class="column medium-down--one-half
                     {% render 'column-width', value: section.settings.collections_per_row %}
                     thumbnail
                     {% if section.settings.align_height %}
@@ -128,7 +128,7 @@
 
             <a class="collection-info__caption" href="{{ collection.url }}">
               {% if section.settings.collection_title_below_image == blank %}
-                <div class="collection-info__caption-wrapper">
+                <div class="collection-info__caption-wrapper {% if section.settings.hide_title_cta == true %} is-hidden{% endif %}">
                   <span class="title">
                     {% if title != blank %}
                       {{ title }}
@@ -148,7 +148,7 @@
             </a>
           </div>
           {% if section.settings.collection_title_below_image != blank %}
-            <a class="collection-info__caption-wrapper collection-info__caption--below-image" href="{{ collection.url }}">
+            <a class="collection-info__caption-wrapper collection-info__caption--below-image {% if section.settings.hide_title_cta == true %} is-hidden{% endif %}" href="{{ collection.url }}">
               <span class="title">
                 {% if title != blank %}
                   {{ title }}
@@ -256,6 +256,12 @@
       "id": "collection_title_below_image",
       "label": "Show collection title below image",
       "default": false
+    },
+    {
+    "type": "checkbox",
+    "id": "hide_title_cta",
+    "label": "Completely hide collection title",
+    "default": false
     },
     {
       "type": "header",

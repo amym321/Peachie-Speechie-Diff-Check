@@ -1,0 +1,149 @@
+<section class="recently-viewed-section">
+  {% render 'heading',
+  	title: {{section_title}},
+  	heading_tag: 'h4',
+  	context: 'recently-viewed',
+  	text_alignment: 'center',
+  %}
+  
+  <div id="recently-viewed-products" class="collection- clearfix-">
+    <div id="rvp-slider" class="rvp-slider">
+    </div>
+  </div>
+</section>
+
+<script type="text/javascript">
+  $(document).ready(function() {
+  	var products = []
+    var currentHandle = '{{handle}}'
+    var recentlyVisited = JSON.parse(window.localStorage.getItem("recentlyVisited"))
+    recentlyVisited = recentlyVisited.filter(rv => rv.available !== false);
+    var count = 0;
+    
+    for (var i = 0; i < recentlyVisited.length; i++) {
+      var currentLength = recentlyVisited.length - 1 - i
+      
+	  var currentObject = recentlyVisited[currentLength];
+      currentObject.productPriceMin = currentObject.productPriceMin.replace(' USD', '');
+      currentObject.productPriceMax = currentObject.productPriceMax.replace(' USD', '');
+      currentObject.productCompareAtPriceFormatted = currentObject.productCompareAtPriceFormatted.replace(' USD', '');
+      console.log({currentObject})
+      
+      if (currentObject.handle !== currentHandle) {        
+        //console.log("float..", parseFloat(currentObject.productPriceMinFloat))
+//         console.log("currentObject..", currentObject)
+
+        
+        if (currentObject.productPriceMin.startsWith("$0.00")) {
+            let displayAmount = currentObject.productPriceMin;
+//             if(displayAmount.startsWith("$0.00")) {
+//               displayAmount = 'Free';
+//             }
+           displayAmount = 'Free';
+          	var price = `
+				<span class="product-thumbnail__price price">
+                	<span class="money">${displayAmount}</span>
+                </span>`
+          } else if (currentObject.productCompareAtPrice > currentObject.productPrice) {
+            	var price = `
+                <span class="product-thumbnail__price price">
+					<small class="sale"><em>from</em></small>
+					<span class="money sale"> ${currentObject.productPriceMin}</span>
+					<span class="money was-price"> ${currentObject.productCompareAtPriceFormatted}</span>
+                </span>
+				<div class="product-thumbnail__sale-badge">{{ 'collections.general.sale' | t }}</div>`
+            } else {
+              	var price = `
+                <span class="product-thumbnail__price price">
+					<small><em></em></small>
+					<span class="money"> ${currentObject.productPriceMin}</span>
+                </span>`
+            } 
+        
+        $("#rvp-slider").append(`
+          <div class="rvp-item">
+            <a class="rvp-item__link" href="${currentObject.productUrl}">
+				<img class="rvp-item__img" src="${currentObject.imageUrl}"/>
+				<p class="rvp-item__title">${currentObject.title}</p> 
+            </a>` + price + `
+          </div>
+        `)
+      }
+
+    }
+    
+    if (recentlyVisited.length > 1 || (recentlyVisited.length === 1 && recentlyVisited[0].handle !== currentHandle)) {
+      $(document).find("#rvp-slider").hide()
+      setTimeout(function() {
+        $(document).find("#rvp-slider").show()
+        initCarousel();
+      }, 500);
+    } else {
+      $(".recently-viewed-section").hide()
+    }
+
+        
+    function initCarousel() {
+      $('#rvp-slider').flickity({
+        // options
+        cellAlign: "left",
+        contain: true,
+        pageDots: false,
+        groupCells: true,
+        arrowShape: "M95,48H9.83L41,16.86A2,2,0,0,0,38.14,14L3.59,48.58a1.79,1.79,0,0,0-.25.31,1.19,1.19,0,0,0-.09.15l-.1.2-.06.2a.84.84,0,0,0,0,.17,2,2,0,0,0,0,.78.84.84,0,0,0,0,.17l.06.2.1.2a1.19,1.19,0,0,0,.09.15,1.79,1.79,0,0,0,.25.31L38.14,86A2,2,0,0,0,41,86a2,2,0,0,0,0-2.83L9.83,52H95a2,2,0,0,0,0-4Z"
+      });
+    }  
+  })
+</script>
+
+<style>
+  .recently-viewed-section {
+    padding: 40px 0px;
+  }
+  
+  .rvp-item {
+    width: 50%;
+    padding: 0px 10px;
+    text-align: center;
+  }
+  
+  @media(min-width: 768px) {
+    .rvp-item {
+      width: 33.33%;
+      padding: 0px 15px;
+    }
+  }
+  
+  @media(min-width: 1200px) {
+    .rvp-item {
+      width: 25%;
+      padding: 0px 20px;
+    }
+  }
+  
+  .rvp-item__link {
+    display: block;
+  }
+
+  .rvp-item__title {
+    margin-top: 10px;
+  }
+  
+  .rvp-item__img {
+    display: block;
+    width: 100%;
+  }
+  
+  .product-thumbnail__sale-badge {
+      position: absolute;
+      top: 5px;
+      right: 25px;
+      width: 58px;
+      height: 58px;
+      background: #dfbe2a;
+      line-height: 58px;
+      border-radius: 50%;
+      font-size: .7rem;
+      display: none;
+    }
+</style>

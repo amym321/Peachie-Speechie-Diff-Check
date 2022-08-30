@@ -187,7 +187,7 @@
 
                   {% comment %} Name {% endcomment %}
                   <h1 class="product_name title">{{ product.title }}</h1>
-
+{% render 'judgeme_widgets', widget_type: 'judgeme_preview_badge', jm_style: '', concierge_install: true, product: product %}
                   {% for tag in product.tags %}
                     {% if tag contains 'meta-size-chart-' %}
                       {% assign meta-size-chart = true %}

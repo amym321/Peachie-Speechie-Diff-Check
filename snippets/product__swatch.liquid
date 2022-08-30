@@ -2,6 +2,8 @@
   Set the extension of your color files below. Use 'png', 'jpeg', 'jpg' or 'gif'.
 {% endcomment %}
 
+{% assign sort_options = settings.sort_options | strip_newlines | split: "," %}
+
 {% assign file_extension = 'png' %}
 
 {% assign swatch = option %}
@@ -20,8 +22,28 @@
   {% endif %}
 {% endfor %}
 
-<div class="swatch is-flex is-flex-wrap" data-option-index="{{ option_index }}">
-  <div class="option-title label" aria-label="{{ value | escape }}" tabindex="0">{{ swatch }}</div>
+{% assign is_size = false %}
+{% for option in product.options %}
+  {% if option == swatch %}
+    {% assign found_option = true %}
+    {% assign option_index = forloop.index0 %}
+    {% assign downcased_option = swatch | downcase %}
+    {% if downcased_option contains 'size' %}
+      {% assign is_size = true %}
+    {% endif %}
+  {% endif %}
+{% endfor %}
+
+<div class="swatch {% if is_size %}swatch-size {% else if is_color %}swatch-color{% endif %} is-flex is-flex-wrap" data-option-index="{{ option_index }}">
+  <div class="option-title label" aria-label="{{ value | escape }}" tabindex="0">
+    {{ swatch }} 
+    {% if is_size %} 
+    	<em class="option-unavailable" data-index="{{ option_index }}">&nbsp;– <span>Choose One</span></em>
+    {% endif %}
+    {% if is_color %} 
+    	<em class="option-unavailable" data-index="{{ option_index }}">&nbsp;– <span>Choose One</span></em>
+    {% endif %}
+  </div>
   {% assign values = '' %}
   {% for variant in product.variants %}
     {% assign value = variant.options[option_index] %}
@@ -29,44 +51,558 @@
       {% assign values = values | join: ',' %}
       {% assign values = values | append: ',' | append: value %}
       {% assign values = values | split: ',' %}
+  
+  	  <div {% if is_size %}data-size_order="{{ value }}"{% endif %} class="{% if is_size %}size-order-div{% endif %}">
+   
+    
+        
+        <input  {% if section.settings.products_per_row == '2' and variant.featured_image %}
+                  data-image="{{ variant.featured_image | img_url: '600x' }}"
+                {% elsif section.settings.products_per_row == '3' and variant.featured_image %}
+                  data-image="{{ variant.featured_image | img_url: '500x' }}"
+                {% elsif variant.featured_image %}
+                  data-image="{{ variant.featured_image | img_url: '400x' }}"
+                {% endif %}
+                class="swatch--{{ value | handle }}"id="swatch-{{ option_index }}-{{ value | handle }}-{{ product.id }}" type="radio" aria-label="{{ value | escape }}" tabindex="0" name="option-{{ option_index }}" value="{{ value | escape }}"{% if forloop.first %} checked{% endif %}/>
 
-      <input  {% if section.settings.products_per_row == '2' and variant.featured_image %}
-                data-image="{{ variant.featured_image | img_url: '600x' }}"
-              {% elsif section.settings.products_per_row == '3' and variant.featured_image %}
-                data-image="{{ variant.featured_image | img_url: '500x' }}"
-              {% elsif variant.featured_image %}
-                data-image="{{ variant.featured_image | img_url: '400x' }}"
-              {% endif %}
-              class="swatch--{{ value | handle }}"id="swatch-{{ option_index }}-{{ value | handle }}-{{ product.id }}" type="radio" aria-label="{{ value | escape }}" tabindex="0" name="option-{{ option_index }}" value="{{ value | escape }}"{% if forloop.first %} checked{% endif %}/>
+        <div aria-label="{{ value | escape }}" tabindex="0" data-value="{{ value | escape }}" data-value-handle="{{ value | handle }}" class="swatch-element {% if is_color %}color {% endif %} {% if is_size %}size {% endif %} {{ value | handle }}-swatch {% if variant.available %}available{% else %}soldout{% endif %}">
+          {% if is_color %}
+            <div class="tooltip">{{ value }}</div>
+          {% endif %}
+          
+          <div class="label-container">
+          {% if is_color %}
+            <label  {% if section.settings.products_per_row == '2' and variant.featured_image%}
+                      data-image="{{ variant.featured_image | img_url: '600x' }}"
+                    {% elsif section.settings.products_per_row == '3' and variant.featured_image %}
+                      data-image="{{ variant.featured_image | img_url: '500x' }}"
+                    {% elsif variant.featured_image %}
+                      data-image="{{ variant.featured_image | img_url: '400x' }}"
+                    {% endif %}
+              for="swatch-{{ option_index }}-{{ value | handle }}-{{ product.id }}" style="background-image-: url({{ variant.image | img_url: '300x300' }}); --background: url('{{ variant.image | img_url: '300x300' }}'); ">
 
-      <div aria-label="{{ value | escape }}" tabindex="0" data-value="{{ value | escape }}" data-value-handle="{{ value | handle }}" class="swatch-element {% if is_color %}color {% endif %}{{ value | handle }}-swatch {% if variant.available %}available{% else %}soldout{% endif %}">
-        {% if is_color %}
-          <div class="tooltip">{{ value }}</div>
-        {% endif %}
-        {% if is_color %}
-          <label  {% if section.settings.products_per_row == '2' and variant.featured_image%}
-                    data-image="{{ variant.featured_image | img_url: '600x' }}"
-                  {% elsif section.settings.products_per_row == '3' and variant.featured_image %}
-                    data-image="{{ variant.featured_image | img_url: '500x' }}"
-                  {% elsif variant.featured_image %}
-                    data-image="{{ variant.featured_image | img_url: '400x' }}"
-                  {% endif %}
-            for="swatch-{{ option_index }}-{{ value | handle }}-{{ product.id }}" style="background-color: {{ value | split: ' ' | last | handle }};">
+              {% assign image_name = value | handle | append: '.' | append: file_extension %}
+              {% assign swatch = images[image_name] %}
+              
+              <img class="img-swatch" src="{{ variant.image | img_url: '300x300' }}" />
 
-            {% assign image_name = value | handle | append: '.' | append: file_extension %}
-            {% assign swatch = images[image_name] %}
+              <img class="swatch__image {% if swatch == empty %}swatch__image--empty{% endif %}" src="{{ swatch | img_url: '50x' }}" alt="">
 
-            <img class="swatch__image {% if swatch == empty %}swatch__image--empty{% endif %}" src="{{ swatch | img_url: '50x' }}" alt="">
+              <span class="crossed-out" aria-label="{{ 'products.product.sold_out' | t }}" alt="{{ 'products.product.sold_out' | t }}"></span>
+            </label>
+          
+            {% else is_size %}
 
-            <span class="crossed-out" aria-label="{{ 'products.product.sold_out' | t }}" alt="{{ 'products.product.sold_out' | t }}"></span>
-          </label>
-        {% else %}
-          <label for="swatch-{{ option_index }}-{{ value | handle }}-{{ product.id }}">
-            {{ value }}
-            <span class="crossed-out" aria-label="{{ 'products.product.sold_out' | t }}" alt="{{ 'products.product.sold_out' | t }}"></span>
-          </label>
-        {% endif %}
+            <label for="swatch-{{ option_index }}-{{ value | handle }}-{{ product.id }}">
+              {{ value }} 	
+              <span class="crossed-out test-size" aria-label="{{ 'products.product.sold_out' | t }}" alt="{{ 'products.product.sold_out' | t }}"></span>
+            </label>
+
+            {% else %}
+          
+            <label for="swatch-{{ option_index }}-{{ value | handle }}-{{ product.id }}">
+              {{ value }}
+              <span class="crossed-out" aria-label="{{ 'products.product.sold_out' | t }}" alt="{{ 'products.product.sold_out' | t }}"></span>
+            </label>
+          
+          {% endif %}
+          </div>
+        </div>
+
       </div>
     {% endunless %}
   {% endfor %}
 </div>
+
+
+
+<style>
+  	
+  .swatch .swatch-element {	
+/*     overflow: hidden; */	
+  }	
+  	
+  .swatch-element.color label {	
+    width: 60px !important;
+    height: 60px !important;
+    border: none;
+/*     -webkit-transition: all 300ms ease;
+    transition: all 300ms ease; */
+/*     -webkit-transform: scale(1, 1); */
+/*     transform: scale(1, 1); */
+    position" relative;
+    
+/*     -webkit-backface-visibility: hidden; */
+/*     -moz-backface-visibility: hidden; */
+/*     -webkit-transform: translate3d(0, 0, 0) scale(1, 1);
+    -moz-transform: translate3d(0, 0, 0) scale(1, 1);
+    transform: scale(1, 1); */
+    
+    overflow: hidden;
+    
+    border-radius: 100px;
+    -webkit-mask-image: -webkit-radial-gradient(white, black);
+    
+    
+/*     position: relative;
+    z-index: 1;
+    -webkit-mask-image: -webkit-radial-gradient(white, black);
+    opacity: 0.999;
+    will-change: transform; */
+  }	
+  	
+  .swatch-element.color label:hover {
+/*     -webkit-transform: scale(1.4, 1.4); */
+/*     transform: scale(1.4, 1.4); */
+/*     background-size: 150%; */
+    
+/*     -webkit-backface-visibility: hidden; */
+/*     -moz-backface-visibility: hidden; */
+/*     -webkit-transform: translate3d(0, 0, 0) scale(1.4, 1.4);
+    -moz-transform: translate3d(0, 0, 0) scale(1.4, 1.4);
+    transform: translate3d(0, 0, 0) scale(1.4, 1.4); */
+  }
+  
+  .swatch-element.color label .img-swatch {
+/*     will-change: transform; */
+    -webkit-transition: all 300ms ease;
+    transition: all 300ms ease;
+  }
+  
+  .swatch-element.color label:hover .img-swatch {
+    -webkit-transform: translate3d(0, 0, 0) scale(1.4, 1.4);
+    -moz-transform: translate3d(0, 0, 0) scale(1.4, 1.4);
+    transform: translate3d(0, 0, 0) scale(1.4, 1.4);
+    
+    
+  }
+  
+/*   .swatch-element.color label::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: red;
+    background-image: var(--background);
+      -webkit-transform: scale(1, 1);
+    transform: scale(1, 1);
+      background-size: contain;
+      
+      -webkit-transition: all 300ms ease;
+    transition: all 300ms ease;
+  } */
+  
+/*   .swatch-element.color label:hover::before {
+    -webkit-transform: scale(1.4, 1.4);
+    transform: scale(1.4, 1.4);
+  } */
+  
+/*   .swatch-element.color label::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 10px solid red;
+  } */
+  
+  	
+  .swatch_options {	
+    display: flex;	
+    flex-direction: column;	
+  }
+  	
+  .swatch_options .swatch-color {	
+    order: -1;
+    
+/*     display: grid; */
+/*     grid-template-columns: repeat( auto-fill, minmax(66px, 1fr) ); */
+/*     justify-items: center; */
+/*     grid-gap: 0px 4px; */
+    
+    display: flex;
+    gap: 0px 4px;
+  }
+  
+  .swatch_options .swatch-color > .label {
+    grid-column-start: 1;
+    grid-column-end: -1;
+  }
+  
+  .swatch_options .swatch-color > div {
+/*     width: 60px;
+    height: 60px; */
+/*     overflow: hidden; */
+  }
+  	
+  .swatch-element {	
+    position: relative;	
+    border: none !important;	
+  }	
+  	
+  .swatch-element::before {	
+    content: "";	
+    position: absolute;	
+    width: 100%;	
+    height: 100%;	
+    border: 1px solid #e2e2e2;	
+    border-image-slice: 1;	
+    top: 0;	
+    left: 0;	
+    z-index: 1;	
+    pointer-events: none;
+    
+    border-radius: 100px;
+
+/*     box-shadow: 0px 0px 0px 4px white; */
+  }	
+  	
+  .swatch_options input:checked+.swatch-element::before {	
+/*     border-image-source: linear-gradient(to left, #e26e3a, #f3b846); */
+    border-width: 2px;
+    border-color: transparent;
+    
+    border-radius: 100px;
+    background-image: linear-gradient(white, white), linear-gradient(to left, #e26e3a, #f3b846);
+    background-origin: border-box;
+    background-clip: content-box, border-box;
+    z-index: -1;
+  }
+  
+  .swatch_options input:checked .label-container {
+    border-radius: 100px;
+  }
+  	
+  .swatch-element,	
+  .swatch-element.color {	
+    border-image-slice: 1;
+    border-width: 1px;
+    padding: 2px;
+  }	
+  	
+/*   .swatch_options input:checked+.swatch-element {	
+    border-image-source: linear-gradient(to left, #e26e3a, #f3b846);	
+  } */	
+  	
+  	
+   .swatch-element.soldout {	
+    position: relative;	
+    border-style: dashed;
+    opacity: 1;
+  }
+  
+  .label-container {
+    position: relative;
+  }
+  
+  .swatch-element.soldout .label-container::before,
+  .swatch-element.soldout .label-container::after {
+    content: "";	
+    position: absolute;	
+    width: 1px;	
+    height: 100%;	
+    top: 50%;	
+    left: 50%;	
+    background: red;	
+    z-index: 1;
+    border: none;
+    transition: opacity 300ms ease;
+    pointer-events: none;
+  }
+  
+  .swatch-element.soldout .label-container::before {	
+    transform: translate3d(-50%, -50%, 0) rotate(-45deg);	
+  }	
+  	
+  .swatch-element.soldout .label-container::after {	
+    transform: translate3d(-50%, -50%, 0) rotate(45deg);	
+  }
+  
+  .swatch-element.soldout .label-container:hover::before,
+  .swatch-element.soldout .label-container:hover::after {
+    opacity: 0;
+  }
+  
+/*  	
+  .swatch-element.soldout::before,	
+  .swatch-element.soldout::after{	
+    content: "";	
+    position: absolute;	
+    width: 1px;	
+    height: 100%;	
+    top: 50%;	
+    left: 50%;	
+    background: red;	
+    z-index: 1;
+    border: none;
+    transition: opacity 300ms ease;
+  }	 */
+  	
+/*   .swatch-element.soldout::before {	
+    transform: translate3d(-50%, -50%, 0) rotate(-45deg);	
+  }	
+  	
+  .swatch-element.soldout::after {	
+    transform: translate3d(-50%, -50%, 0) rotate(45deg);	
+  }	
+  	
+  .swatch .swatch-element.soldout label {	
+    opacity: 1;	
+  }	
+  	
+  .swatch_options .swatch-element.soldout label {	
+    outline: 1px dashed #e2e2e2;	
+    outline-offset: -1px;	
+  }
+  
+  .swatch-element.soldout:hover::before,
+  .swatch-element.soldout:hover::after {
+    opacity: 0;
+  } */
+  
+  .swatch-element .tooltip {
+    display: none;
+  }
+  
+  @media(min-width: 1200px) {
+    .swatch-element .tooltip {
+      display: block;
+    }
+  }
+  	
+  .option-unavailable {	
+/*     visibility: hidden; */	
+  }	
+  	
+/*   .option-unavailable span {	
+    color: #cf6b39;	
+  } */
+  	
+  .option-unavailable.is-hidden {	
+    display: none;	
+  }
+  
+  .option-unavailable .selected {
+    color: #000;
+  }
+  
+  .swatch {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .swatch .option-title {	
+    display: flex;	
+  }
+  	
+  .swatch-size {	
+    position: relative;	
+  }	
+  	
+  @keyframes placeHolderShimmer{	
+    0%{	
+      background-position: -468px 0	
+    }	
+    100%{	
+      background-position: 468px 0	
+    }	
+  }	
+  	
+/*   .swatch-size::before {	
+    content: "";	
+    animation-duration: 1s;	
+    animation-fill-mode: forwards;	
+    animation-iteration-count: infinite;	
+    animation-name: placeHolderShimmer;	
+    animation-timing-function: linear;	
+    background: #f6f7f8;	
+    background: linear-gradient(to right, #eeeeee 8%, #dddddd 18%, #eeeeee 33%);	
+    background-size: 1000px 104px;	
+    position: absolute;	
+    top: 0;	
+    left: 0;	
+    width: 100%;	
+    height: 100%;	
+    overflow: hidden;	
+    z-index: 1;	
+  }	 */
+  	
+  .swatch-size.is-loaded::before {	
+    display: none;	
+  }	
+  	
+  .button--add-to-cart.disabled {	
+/*     display: none; */	
+  }	
+  	
+  .label-container {
+    overflow: hidden;
+    border-radius: 100px;
+  }
+  
+  .swatch .tooltip {
+    pointer-events: none;
+  }
+  
+</style>
+
+<script>
+
+  window.onload = () => {
+    let actualOrder = {{sort_options | json}};
+    actualOrder = actualOrder.map(s => s.toLowerCase());
+    $('.size-order-div').each(function(index, data) {
+      let currentOrder = $(data).data('size_order') || '';
+      let pos = actualOrder.indexOf(currentOrder.toString().toLowerCase());
+      if(pos !== -1) {
+      	$(data).css('order', pos+2);
+      }
+    });
+    
+    $(".swatch-size").addClass("is-loaded");
+    
+    //$(".size-order-div input").prop('checked', false);
+    
+//     $(".swatch-element").on("click", function(){
+// //       $(".option-unavailable").removeClass("is-visible");
+//       if(!$(this).hasClass("soldout")) {
+// //         $(".option-unavailable").addClass("is-hidden");
+//       } else {
+//         $(".option-unavailable").removeClass("is-hidden");
+//       }
+//     })
+    
+
+//   	var products = []
+//     var currentHandle = '{{handle}}'
+//     var recentlyVisited = JSON.parse(window.localStorage.getItem("recentlyVisited"))
+//     var count = 0;
+    
+//     for (var i = 0; i < recentlyVisited.length; i++) {
+      
+// 	  var currentObject = recentlyVisited[i];
+//       if (currentObject.handle !== currentHandle) {        
+//         console.log("float..", parseFloat(currentObject.productPriceMinFloat))
+        
+//         if (currentObject.productPriceVaires === "false") {
+//           var price = `
+// 				<span class="product-thumbnail__price price">
+//                 	<span class="money">${currentObject.productPriceMin}</span>
+//                 </span>`
+//           } else if (currentObject.productPriceVaires === "true" && currentObject.productPriceMax != "$0.00") {
+//             var price = `
+//                 <span class="product-thumbnail__price price">
+// 					<small><em>from</em></small>
+// 					<span class="money"> ${currentObject.productPriceMax}</span>
+//                 </span>`
+//             } else if (currentObject.productPriceVaires === "true" && currentObject.productPriceMax === "$0.00") {
+//               var price = `
+//                 <span class="product-thumbnail__price price">
+// 					<small><em>from</em></small>
+// 					<span class="money"> ${currentObject.productPriceMin}</span>
+//                 </span>`
+//             } 
+        
+//         $("#rvp-slider").append(`
+//           <div class="rvp-item">
+//             <a class="rvp-item__link" href="${currentObject.productUrl}">
+// 				<img class="rvp-item__img" src="${currentObject.imageUrl}"/>
+// 				<p class="rvp-item__title">${currentObject.title}</p> 
+//             </a>` + price + `
+//           </div>
+
+
+//         `)
+//       }
+
+//     }
+    
+//     setTimeout(function() {
+//       initCarousel();
+//     }, 1000);
+
+        
+//     function initCarousel() {
+//       console.log("inside initCarousel")
+      
+//       $('#rvp-slider').flickity({
+//         // options
+//         cellAlign: "left",
+//         contain: true,
+//         pageDots: false,
+//         groupCells: true
+//       });
+//     }   
+
+    
+  }
+  
+
+ 
+
+  
+</script>
+
+<script>
+  
+  var events_attached_products = {}
+  
+  // step 1
+  function handleSwatchOptions(product_id_h, skipevent = false) {
+//     console.log("handleSwatchOptions", product_id_h);
+    $(`#product_form_${product_id_h} > div.swatch_options .swatch`).each((idx,elem) => {
+      const inptElems = $(elem).find('input[type="radio"]');
+      updateSelectedValue(inptElems, elem);
+      
+      if(!skipevent) {
+        addRadioClickEventListeners(elem, product_id_h)
+      }
+    })
+  }
+  
+  // step 2
+  function updateSelectedValue(inptElems, parent) {
+//     console.log("updateSelectedValue:start", parent);
+    let selectedValue = "Choose One";
+    for(const radio of inptElems) {
+//       console.log(radio.value, radio.checked, $(radio).siblings('div').hasClass('soldout'));
+      if(radio.checked) {
+        if($(radio).siblings('div').hasClass('soldout')) {
+        	continue
+        }
+        selectedValue = radio.value;
+      }
+    }
+    $(parent).find('.option-unavailable span').text(selectedValue);
+  }
+  
+  // step 3 -> step 2
+  function addRadioClickEventListeners(parent, product_id_h) {
+//     console.log("addRadioClickEventListeners", product_id_h);
+    $(`#product_form_${product_id_h} > div.swatch_options .swatch`).each((idx,elem) => {
+      const inptElems = $(elem).find('input[type="radio"]');
+      
+      for(const radio of inptElems) {
+        radio.addEventListener('click', function() {
+//           console.log('radio clicked');
+          handleSwatchOptions(product_id_h, true)
+//           updateSelectedValue(inptElems, elem);           
+          
+        });
+      }
+      
+    })
+    
+  }
+  
+  document.addEventListener('quick-shop:loaded', function(event) {
+    if(events_attached_products[event.detail]) {
+    	return;
+    }
+//     console.log("addEventListener", event.detail)
+    events_attached_products[event.detail] = 1;
+  	handleSwatchOptions(event.detail);
+  });
+</script>

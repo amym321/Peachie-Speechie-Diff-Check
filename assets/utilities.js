@@ -564,6 +564,13 @@ Shopify.linkOptionSelectors = function (product, parent) {
     if (product.options.length === 3) Shopify.theme.updateOptionsInSelector(2, parent);
     return true;
   });
+  
+  //   <Raj addedOn={24 july 2021}>
+  $(document).trigger('optionsMapAvailable');
+  
+//   var $soldoutSwatchInit = $(".swatch-element.soldout");
+//   $soldoutSwatchInit.removeClass("soldout");
+  //   </Raj addedOn={24 july 2021}>
 };
 
 Shopify.theme.applyMasonry = function (selector, gutterSize) {
@@ -1902,6 +1909,9 @@ Shopify.theme.thumbnail = {
     }
 
     $('.js-quick-shop select[name="id"]').trigger('change');
+
+    const custom_event = new CustomEvent('quick-shop:loaded', {detail: productData.product_id});
+    document.dispatchEvent(custom_event);
   },
   createImageObjects: function createImageObjects($images) {
     //split image info

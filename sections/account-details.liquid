@@ -62,6 +62,15 @@
             <p><a href="{{ routes.account_addresses_url }}">{{ 'customer.account.view_addresses' | t }} ({{ customer.addresses_count }})</a></p>
         </div>
       </div>
+      <p>
+      <div class="has-padding-top">
+        {% render 'button',
+                style: 'button-primary',  
+        %}
+  <a href="/apps/downloads/orders/{{customer.id}}" class="btn button">
+    My Downloadable Files
+  </a>
+</p>
       <div class="has-padding-top">
         {% capture logout_link %}{{ routes.account_logout_url }}{% endcapture %}
         {% capture logout_label %}{{ 'layout.customer.log_out' | t }}{% endcapture %}

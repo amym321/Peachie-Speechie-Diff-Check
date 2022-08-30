@@ -74,7 +74,7 @@
     <div class="mobile-icons {% if settings.show_search_icon_mobile == false %}has-one-icon{% endif %}">
       {% if settings.show_search_icon_mobile %}
         {% comment %} Search icon {% endcomment %}
-        <a class="header__link action-area__link" data-show-search-trigger>
+        <a class="header__link action-area__link snize-custom-widget-opener" data-show-search-trigger>
           {% render 'icon',
                   name: 'search',
                   icon_class: 'header__icon'

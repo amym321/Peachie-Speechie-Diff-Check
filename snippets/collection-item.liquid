@@ -1,0 +1,70 @@
+<div class="{% render 'column-width', value: section.settings.collections_per_row  %} column thumbnail {% if section.settings.align_height %}list-collection--align-height{% endif %} list-collection__thumbnail medium-down--one-half small-down--one-whole" {% if section.settings.pagination_type != 'basic_pagination' %}data-load-more--grid-item{% endif %}>
+  <div class="product-wrap">
+    <div class="collection-thumbnail-overlay"></div>
+    {% if collection.image != blank %}
+    {% assign collection_image = collection.image %}
+    {% assign collection_image_alt = collection.image.alt | escape %}
+    {% else collection.empty? == false %}
+    {% assign collection_image = collection.products.first.featured_image %}
+    {% assign collection_image_alt = collection.products.first.featured_image.alt | escape %}
+    {% endif %}
+
+    {% if collection_image != nil %}
+    <div class="thumbnail image__container has-image-crop">
+      {% render 'image-element',
+                        image: collection_image.src,
+      alt: collection_image_alt,
+      image_crop: true,
+      max_height: collection_height
+      %}
+    </div>
+    {% else %}
+    {% capture num %}{% cycle "1", "2", "3", "4", "5", "6" %}{% endcapture %}
+    {{ 'collection-' | append: num | placeholder_svg_tag: 'placeholder-svg' }}
+    {% endif %}
+    <a class="collection-info__caption" href="{{ collection.url }}">
+      {% if section.settings.collection_title_below_image == blank %}
+      {% endif %}
+    </a>
+    <div class="collection-info__caption-wrapper">
+      <span class="title">
+        {{ collection.title }}
+      </span>
+      {% assign view_products = 'collections.general.view_all' | t %}
+      {% render 'button',
+                          label: view_products,
+      href: collection.url,
+      style: section.settings.button_style
+      %}
+    </div>
+  </div>
+  {% if section.settings.collection_title_below_image != blank %}
+  <a class="collection-info__caption-wrapper collection-info__caption--below-image" href="{{ collection.url }}">
+    <span class="title">
+      {{ collection.title }}
+    </span>
+    {% assign view_products = 'collections.general.view_all' | t %}
+    {% render 'button',
+                      label: view_products,
+    href: collection.url,
+    style: section.settings.button_style
+    %}
+  </a>
+  {% endif %}
+</div>
+
+
+<style>
+  
+  .collection-info__caption-wrapper {
+    display: grid;
+  }
+  
+  .collection-info__caption-wrapper .title {
+    margin: 10px 0px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  
+</style>

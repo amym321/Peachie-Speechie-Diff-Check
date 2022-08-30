@@ -68,7 +68,9 @@
   has-padding-bottom"
   {% if section.settings.pagination_type != 'basic_pagination' %}
     data-load-more--grid-item
-  {% endif %}>
+  {% endif %}
+  data-product-id="{{ product.id }}"   
+  >
   <div class="product-wrap">
 
       <div class="product-image__wrapper">

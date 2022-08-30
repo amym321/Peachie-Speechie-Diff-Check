@@ -75,7 +75,7 @@
             has-padding-top
             ">
 
-  {% paginate collections by section.settings.pagination_limit %}
+  
 
     <div class="list-collection-wrapper container" {% if section.settings.pagination_type != 'basic_pagination' %}data-load-more--grid {% endif %}>
 
@@ -86,75 +86,176 @@
               context: 'list-collection',
               text_alignment: 'left'
       %}
+      
+      {% if section.settings.display_type == 'all' %}
+      
+      {% paginate collections by section.settings.pagination_limit %}
 
       {% for collection in collections %}
         {% capture collection_title %}{{ collection.title | escape }}{% endcapture %}
+      	
         <div class="{% render 'column-width', value: section.settings.collections_per_row  %} column thumbnail {% if section.settings.align_height %}list-collection--align-height{% endif %} list-collection__thumbnail medium-down--one-half small-down--one-whole" {% if section.settings.pagination_type != 'basic_pagination' %}data-load-more--grid-item{% endif %}>
           <div class="product-wrap">
             <div class="collection-thumbnail-overlay"></div>
             {% if collection.image != blank %}
-              {% assign collection_image = collection.image %}
-              {% assign collection_image_alt = collection.image.alt | escape %}
+            {% assign collection_image = collection.image %}
+            {% assign collection_image_alt = collection.image.alt | escape %}
             {% else collection.empty? == false %}
-              {% assign collection_image = collection.products.first.featured_image %}
-              {% assign collection_image_alt = collection.products.first.featured_image.alt | escape %}
+            {% assign collection_image = collection.products.first.featured_image %}
+            {% assign collection_image_alt = collection.products.first.featured_image.alt | escape %}
             {% endif %}
 
             {% if collection_image != nil %}
-              <div class="thumbnail image__container has-image-crop">
-                {% render 'image-element',
-                        image: collection_image.src,
-                        alt: collection_image_alt,
-                        image_crop: true,
-                        max_height: collection_height
-                %}
-              </div>
+            <div class="thumbnail image__container has-image-crop">
+              {% render 'image-element',
+                          image: collection_image.src,
+              alt: collection_image_alt,
+              image_crop: true,
+              max_height: collection_height
+              %}
+            </div>
             {% else %}
-              {% capture num %}{% cycle "1", "2", "3", "4", "5", "6" %}{% endcapture %}
-              {{ 'collection-' | append: num | placeholder_svg_tag: 'placeholder-svg' }}
+            {% capture num %}{% cycle "1", "2", "3", "4", "5", "6" %}{% endcapture %}
+            {{ 'collection-' | append: num | placeholder_svg_tag: 'placeholder-svg' }}
             {% endif %}
             <a class="collection-info__caption" href="{{ collection.url }}">
               {% if section.settings.collection_title_below_image == blank %}
-                <div class="collection-info__caption-wrapper">
-                  <span class="title">
-                    {{ collection.title }}
-                  </span>
-                  {% assign view_products = 'collections.general.view_all' | t %}
-                  {% render 'button',
-                          label: view_products,
-                          href: collection.url,
-                          style: section.settings.button_style
-                  %}
-                </div>
               {% endif %}
             </a>
-          </div>
-          {% if section.settings.collection_title_below_image != blank %}
-            <a class="collection-info__caption-wrapper collection-info__caption--below-image" href="{{ collection.url }}">
+            <div class="collection-info__caption-wrapper {% if section.settings.schema.hide_title_cta == true %} is-hidden{% endif %}">
               <span class="title">
                 {{ collection.title }}
               </span>
               {% assign view_products = 'collections.general.view_all' | t %}
               {% render 'button',
-                      label: view_products,
-                      href: collection.url,
-                      style: section.settings.button_style
+                            label: view_products,
+              href: collection.url,
+              style: section.settings.button_style
               %}
-            </a>
+            </div>
+          </div>
+          {% if section.settings.collection_title_below_image != blank %}
+          <a class="collection-info__caption-wrapper collection-info__caption--below-image" href="{{ collection.url }}">
+            <span class="title">
+              {{ collection.title }}
+            </span>
+            {% assign view_products = 'collections.general.view_all' | t %}
+            {% render 'button',
+                        label: view_products,
+            href: collection.url,
+            style: section.settings.button_style
+            %}
+          </a>
           {% endif %}
         </div>
+      
       {% endfor %}
-    </div>
-    <div class="container">
-      <div class="one-whole column text-align-center">
-        {% render 'pagination',
+
+      <div class="container">
+        <div class="one-whole column text-align-center">
+          {% render 'pagination',
                 paginate: paginate,
-                pagination_type: section.settings.pagination_type
-        %}
+          pagination_type: section.settings.pagination_type
+          %}
+        </div>
       </div>
+      {% endpaginate %}
+      
+      {% else %}
+      
+      {% for block in section.blocks %}
+        {%- assign collection = collections[block.settings.collection] -%}
+
+        <div class="{% render 'column-width', value: section.settings.collections_per_row  %} column thumbnail {% if section.settings.align_height %}list-collection--align-height{% endif %} list-collection__thumbnail medium-down--one-half small-down--one-whole" {% if section.settings.pagination_type != 'basic_pagination' %}data-load-more--grid-item{% endif %}>
+          <div class="product-wrap">
+            <div class="collection-thumbnail-overlay"></div>
+            {% if collection.image != blank %}
+            {% assign collection_image = collection.image %}
+            {% assign collection_image_alt = collection.image.alt | escape %}
+            {% else collection.empty? == false %}
+            {% assign collection_image = collection.products.first.featured_image %}
+            {% assign collection_image_alt = collection.products.first.featured_image.alt | escape %}
+            {% endif %}
+
+            {% if collection_image != nil %}
+            <div class="thumbnail image__container has-image-crop">
+              {% render 'image-element',
+                          image: collection_image.src,
+              alt: collection_image_alt,
+              image_crop: true,
+              max_height: collection_height
+              %}
+            </div>
+            {% else %}
+            {% capture num %}{% cycle "1", "2", "3", "4", "5", "6" %}{% endcapture %}
+            {{ 'collection-' | append: num | placeholder_svg_tag: 'placeholder-svg' }}
+            {% endif %}
+            <a class="collection-info__caption" href="{{ collection.url }}">
+              {% if section.settings.collection_title_below_image == blank %}
+              {% endif %}
+            </a>
+            <div class="collection-info__caption-wrapper {% if section.settings.hide_title_cta %}is-hidden{% endif %}">
+              <span class="title">
+                {{ collection.title }}
+              </span>
+              {% assign view_products = 'collections.general.view_all' | t %}
+              {% render 'button',
+                            label: view_products,
+              href: collection.url,
+              style: section.settings.button_style
+              %}
+            </div>
+          </div>
+          {% if section.settings.collection_title_below_image != blank %}
+          <a class="collection-info__caption-wrapper collection-info__caption--below-image" href="{{ collection.url }}">
+            <span class="title">
+              {{ collection.title }}
+            </span>
+            {% assign view_products = 'collections.general.view_all' | t %}
+            {% render 'button',
+                        label: view_products,
+            href: collection.url,
+            style: section.settings.button_style
+            %}
+          </a>
+          {% endif %}
+        </div>
+      
+      {% endfor %}
+      
+      {% endif %}
     </div>
-  {% endpaginate %}
+    
 </main>
+
+<style>
+  
+  .collection-info__caption-wrapper {
+    display: grid;
+  }
+  
+  .collection-info__caption-wrapper .title {
+    margin: 10px 0px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  
+  .collection-info__caption-wrapper.is-hidden {
+    display: none;
+  }
+  
+  .list-collection-wrapper .list-collection__thumbnail {
+    margin-bottom: 20px;
+  }
+  
+  @media (max-width: 480px) {
+    .list-collection__thumbnail {
+      width: calc(50% - 20px) !important;
+    }
+  }
+  
+</style>
 
 {% schema %}
 
@@ -162,6 +263,34 @@
   "name": "Collections",
   "class": "collection-list-main",
   "settings": [
+	{
+      "type": "header",
+      "content": "Select collections to show",
+      "info": "Pick between showing specific collections or all collections in your store."
+    },
+	{
+        "type": "radio",
+        "id": "display_type",
+        "label": "Collections to show",
+        "default": "all",
+        "options": [
+          {
+            "value": "all",
+            "label": "All"
+          },
+          {
+            "value": "selected",
+            "label":"Selected"
+          }
+        ]
+      },
+	{
+      "type": "checkbox",
+      "id": "hide_title_cta",
+      "label": "Hide collection title and CTA button",
+      "info": "Hide collection title and CTA button",
+      "default": false
+    },
     {
       "type": "range",
       "id": "collections_per_row",
@@ -175,6 +304,7 @@
       "type": "range",
       "id": "pagination_limit",
       "label": "Collections per page",
+	  "info": "Pagination enabled only if collections to show is 'All'.",
       "min": 2,
       "max": 50,
       "step": 1,
@@ -326,7 +456,20 @@
       "id": "custom_css",
       "label": "Custom CSS"
     }
-  ]
+  ],
+  "blocks": [
+      {
+        "type": "collection",
+        "name": "Collection",
+        "settings": [
+          {
+            "label":"Collection",
+            "id": "collection",
+            "type": "collection"
+          }
+        ]
+      }
+    ]
 }
 
 {% endschema %}

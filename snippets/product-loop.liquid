@@ -27,6 +27,9 @@
 
 {% for product in products limit: for_limit %}
 
+  {% comment %} === Hide all products with a tag of "hide" {% endcomment %}
+  {% unless product.tags contains 'hidden-recommendation' %}
+
   {% comment %} Skip product if we're on its product page {% endcomment %}
   {% if product.id != skip_product.id %}
     {% render 'product-thumbnail',
@@ -41,6 +44,9 @@
             related_products: related_items
     %}
   {% endif %}
+
+  {% endunless %}
+
 {% endfor %}
 
 {% comment %} JSON-LD Structured data - https://developers.google.com/search/docs/guides/intro-structured-data {% endcomment %}

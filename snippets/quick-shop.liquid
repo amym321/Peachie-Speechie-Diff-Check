@@ -109,3 +109,14 @@
 </div>
 
 <script src="{{ 'z__jsProduct.js' | asset_url }}"></script>
+
+<!-- <script src="{{ 'hwg_product_swatch_selection.js' | asset_url }}"></script> -->
+
+<script>
+  console.log("qs");
+  function postQuickShopLoaded(event) {
+//   	debugger;
+  }
+  
+  document.addEventListener('quick-shop:loaded', postQuickShopLoaded);
+</script>

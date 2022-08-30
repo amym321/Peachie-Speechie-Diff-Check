@@ -2,6 +2,7 @@
 <!doctype html>
 <html lang="{{ shop.locale }}">
 <head>
+  {% include 'kiwiSizing' %}
   <meta charset="utf-8">
   <meta http-equiv="cleartype" content="on">
   <meta name="robots" content="index,follow">
@@ -78,7 +79,11 @@
   {% comment %}Inject theme-object end{% endcomment %}
 
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js" defer></script>
+<!--   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js" defer></script> -->
+  <script
+  src="https://code.jquery.com/jquery-3.6.0.min.js"
+  integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+  crossorigin="anonymous"></script>
   <script src="{{ 'vendors.js' | asset_url }}" defer></script>
   <script src="{{ 'utilities.js' | asset_url }}" defer></script>
   <script src="{{ 'app.js' | asset_url }}" defer></script>
@@ -119,6 +124,20 @@
 
     </style>
   </noscript>
+  <style>
+    .essential_countdown_annoucement_bar_wrapper {
+      font-family: "ITC Johnston";
+    }
+    #countdown_annoucement_bar_title_cl59y1pzp3390551qrvvp3rfcjm {
+      text-align: center !important;
+    }
+    .countdown_annoucement_bar_wrapper_cl59y1pzp3390551qrvvp3rfcjm div:nth-child(2)  {
+      display: none !important;
+    }
+    .countdown_timer_wrapper_cl5h7wyy23529711qvyh1p50zf6, .countdown_timer_wrapper_cl5i8uzfc2208111atmy3rtegru {
+      font-family: "ITC Johnston";
+    }
+  </style>
 
   {%- if page_description -%}
     <meta name="description" content="{{ page_description | escape }}{% if current_tags %} {{ 'general.meta.tagged_html' | t: tags: meta_tags | escape }}.{% endif %}{% if current_page != 1 %} {{ 'general.meta.page' | t: page_number: current_page }}.{% endif %}" />
@@ -138,7 +157,17 @@
     <link rel="shortcut icon" type="image/x-icon" href="{{ 'favicon.png' | asset_url }}">
   {%- endif -%}
 
-  {{ content_for_header }}
+  
+
+
+
+
+
+  <!-- Avada Email Marketing Script -->
+ {% include 'avada-em-setting' %}
+  <!-- /Avada Email Marketing Script -->
+
+{{ content_for_header }}
 
   {% render 'social-meta-info' %}
   {% if collection.previous_product %}<link rel="prev" href="{{ collection.previous_product }}">{% endif %}
@@ -148,6 +177,9 @@
     {{ "shopify_common.js" | shopify_asset_url | script_tag }}
     {{ "customer_area.js"  | shopify_asset_url | script_tag }}
   {% endif %}
+  {% render 'judgeme_core' %}
+
+{% render 'gsf-conversion-pixels' %}
 </head>
 
 {% if template.name == 'index' %}
@@ -187,6 +219,8 @@
   data-shop-url="{{ shop.url }}"
   data-current-lang="{{ request.locale.iso_code }}"
 >
+  <script>!function(){window.SLIDECART=!0;window.SLIDECART_FORMAT='{{shop.money_format}}';var e="https://cdn.jsdelivr.net/gh/apphq/slidecart-dist@master/slidecarthq.js?"+(new Date).getTime(),t=document.createElement("script");t.type="text/javascript",t.src=e,document.querySelector("body").appendChild(t)}();</script>
+  
   {%- if settings.show_announcement_bar -%}
     {% section 'announcement-bar' %}
   {%- endif -%}
@@ -260,6 +294,8 @@
     </div>
   {% endif %}
 
+  <script src="//cdn.codeblackbelt.com/js/modules/also-bought/main.min.js?shop=peachie-speechie.myshopify.com" defer></script>
+
   {% if settings.show_fixed_message %}
     {% section 'fixed-message' %}
   {% endif %}
@@ -277,6 +313,86 @@
   {% endif %}
 
   {% render 'mobile-search' %}
+
+  {% render 'app_wishlist-king' %}
+   {% include 'smile-initializer' %}
+  
+<!-- appHQ : SlideCart Edits -->
+<style>
+    .customEmptyCart {
+        display: block !important
+    }
+
+    .customEmptyCart__innerContent {
+        padding: 1.2rem;
+    }
+
+    #slidecarthq .empty {
+        color: #868785;
+        position: absolute;
+        width: 100%;
+        top: 91px;
+        bottom: 0;
+    }
+
+    .customEmptyCart__headerTitle {
+        font-size: 1.7rem;
+        font-weight: 700;
+        color: black;
+    }
+
+    .customEmptyCart__headerLead {
+        font-size: 1.1rem;
+        font-weight: 400;
+        color: black;
+      padding-bottom: 30px;
+    }
+
+    .customEmptyCart__buttons {
+        display: flex !important;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-top: 1.2rem;
+    }
+
+    a.customEmptyCart__button {
+        display: block;
+        padding: 0.5rem 1rem;
+        background: #67b857;
+        width: 100%;
+        border-radius: 25px;
+        color: #fff;
+        text-transform: uppercase;
+        font-weight: 700;
+        letter-spacing: 1px;
+      background-color: black;
+}
+a.customEmptyCart__button:hover
+{ background-color: #67B857;
+  transition: all 300ms ease;
+    }
+
+    #slidecarthq .quantity-selector button:first-of-type {
+        border-top-left-radius: 50px;
+        border-bottom-left-radius: 50px;
+    }
+
+    #slidecarthq .quantity-selector button:last-of-type {
+        border-top-right-radius: 50px;
+        border-bottom-right-radius: 50px;
+    }
+
+    #slidecarthq .upsell-add button, #slidecarthq .upsell-options select {
+        border-radius: 50px !important;
+    }
+
+    #slidecarthq .footer .button, #slidecarthq .upsell-options button {
+        border-radius: 55px !important;
+    }
+</style>
+<!-- END appHQ : SlideCart Edits -->
+  
+<script src="https://cdn.static.kiwisizing.com/SizingPlugin.prod.js?v=308&shop=peachie-speechie.myshopify.com"></script>
 </body>
 </html>
 {% endcapture %}

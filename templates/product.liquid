@@ -45,7 +45,9 @@
       <div class="container">
         {% section 'product__sidebar' %}
         {% section 'product-sections__main' %}
+        {% comment %}
         {% section 'product__recommendations' %}
+        {% endcomment %}
       </div>
 
     </section>
@@ -141,3 +143,32 @@
     </section>
   </div>
 {% endif %}
+
+
+{% comment %}{% endcomment %}
+{% section 'recently-viewed-section' %}
+{% render 'judgeme_widgets', widget_type: 'judgeme_review_widget', concierge_install: true, product: product %}
+
+<!-- <Raj addedOn={24 july 2021}> -->
+<script src="{{ 'hwg_product_swatch_selection.js' | asset_url }}"></script>
+<!-- </Raj>Raj addedOn={24 july 2021}> -->
+
+
+
+<script type="text/javascript">
+  window.AVADA_EM = window.AVADA_EM || {};
+
+  window.AVADA_EM.product = {
+    id: {{ product.id|json }},
+    title: {{ product.title|json }},
+    variants: {{ product.variants|json }},
+    selectedVariant: {{ product.selected_variant.id|json }},
+    vendor: {{ product.vendor|json }},
+    productType: {{ product.type|json }},
+    collections: {{ product.collections|map:'title'|json }},
+    image: "https:{{ product.featured_image.src|img_url:'grande' }}",
+    url: "{{ shop.secure_url }}{{ product.url }}",
+    price: {{ product.price |json }},
+    tags: {{ product.tags |json }},
+  };
+</script>

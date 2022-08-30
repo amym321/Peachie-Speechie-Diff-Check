@@ -11,6 +11,7 @@
 {% comment %} Advanced {% endcomment %}
 {% assign css_class = section.settings.css_class %}
 {% assign custom_css = section.settings.custom_css %}
+{% assign hwg_unselect_on_load = section.settings.hwg_unselect_on_load %}
 
 {% comment %} Section specific CSS {% endcomment %}
 {% style %}
@@ -121,7 +122,7 @@
 
           {% comment %} Name {% endcomment %}
           <h1 class="product_name title">{{ product.title }}</h1>
-
+{% render 'judgeme_widgets', widget_type: 'judgeme_preview_badge', jm_style: '', concierge_install: true, product: product %}
           {% for tag in product.tags %}
             {% if tag contains 'meta-size-chart-' %}
               {% assign meta-size-chart = true %}
@@ -277,6 +278,10 @@
 </section>
 
 {% comment %} JavaScript {% endcomment %}
+<script>
+  window.hwg_unselect_on_load = "{{hwg_unselect_on_load}}";
+  window.hwg_selected_id = "{{variant.id}}";
+</script>
 <script
   type="application/json"
   data-section-id="{{ section.id }}"
@@ -403,6 +408,13 @@
     {{ product.metafields.spr.reviews }}
   </div>
 </div>
+
+
+<style>
+  .option-unavailable span {	
+    color: {{section.settings.unavailableTextColor}};
+  }
+</style>
 
 {% schema %}
 
@@ -577,6 +589,16 @@
       "info": "Each customer will see their preferred payment method from those available on your store, such as PayPal or Apple Pay. [Learn more](https:\/\/help.shopify.com\/manual\/using-themes\/change-the-layout\/dynamic-checkout)",
       "default": true
     },
+	{
+      "type": "header",
+      "content": "Option Swatches"
+    },
+    {
+      "type": "color",
+      "id": "unavailableTextColor",
+      "default": "#cf6b39",
+	  "label": "Option unavailable message color"
+    },
     {
       "type": "header",
       "content": "Media",
@@ -708,6 +730,12 @@
       "type": "textarea",
       "id": "custom_css",
       "label": "Custom CSS"
+    },
+	{
+      "type": "checkbox",
+      "id": "hwg_unselect_on_load",
+      "label": "Unselect options on page load",
+	  "default": false
     }
   ],
   "blocks": [

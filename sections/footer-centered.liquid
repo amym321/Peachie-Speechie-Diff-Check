@@ -28,6 +28,12 @@
   %}
 {% endstyle %}
 
+{% comment %}
+{% if template contains 'product' %}
+{% render 'judgeme_widgets', widget_type: 'judgeme_review_widget', concierge_install: true, product: product %}
+{% endif %}
+{% endcomment %}
+
 {% comment %} HTML markup {% endcomment %}
 <footer class="footer__container {{ css_class }}">
   <section class="footer__content
